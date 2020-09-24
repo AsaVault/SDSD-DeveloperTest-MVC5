@@ -128,9 +128,15 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\UserDetailController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202009240824047_Initial.cs" />
+    <Compile Include="Migrations\202009240824047_Initial.designer.cs">
+      <DependentUpon>202009240824047_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\DeveloperTestDbContext.cs" />
     <Compile Include="Models\UserDetail.cs" />
     <Compile Include="Models\UserUpload.cs" />
@@ -174,6 +180,11 @@
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\UserDetail\Create.cshtml" />
+    <Content Include="Views\UserDetail\Delete.cshtml" />
+    <Content Include="Views\UserDetail\Details.cshtml" />
+    <Content Include="Views\UserDetail\Edit.cshtml" />
+    <Content Include="Views\UserDetail\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -191,6 +202,11 @@
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-3.4.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.4.1.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\202009240824047_Initial.resx">
+      <DependentUpon>202009240824047_Initial.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
