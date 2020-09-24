@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - SDSD DEVELOPER TEST</title>
+
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
 </head>
@@ -27,7 +28,15 @@
             </div>
         </div>
     </div>
-    <div class="container body-content">
+
+    
+    <div class="container-fluid body-content">
+        <div class="text-center">
+            <div class="alert alert-info alert-dismissible " role="alert">
+                <h1 class="display-4 text-uppercase font-weight-normal">Welcome to SDSD Developer Test Exercise</h1>
+            </div>
+        </div>
+
         @RenderBody()
         <hr />
         <footer>
@@ -35,6 +44,8 @@
         </footer>
     </div>
 
+
+    @*<script src="~/packages/twitter-bootstrap/js/bootstrap.min.js"></script>*@
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)

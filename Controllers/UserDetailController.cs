@@ -20,9 +20,41 @@ namespace SDSD_DeveloperTest_MVC5.Controllers
         // GET: UserDetail
         public ActionResult Index()
         {
-            return View(db.UserDetail.ToList());
+            var userDb = db.UserDetail.ToList();
+            var data = new IndexViewModel()
+            {
+                Users = userDb
+            };
+            ViewBag.Success = TempData["Alert"];
+            ViewBag.User = TempData["User"];
+            return View(data);
         }
 
+        // SEARCH: UserDetail/Search
+        public ActionResult Search(IndexViewModel model)
+        {
+            ViewBag.Error = false;
+            ViewBag.Search = false;
+            var userList = db.UserDetail.ToList();
+            var userUploads = db.UserDetail.Include(x => x.UserUpload).FirstOrDefault(x => x.TransactionId == model.TransactionId && x.Email == model.Email);
+            var data = new IndexViewModel();
+            if (userUploads == null)
+            {
+                TempData["Error"] = true;
+                ViewBag.Error = TempData["Error"];
+                data.Users = userList;
+            }
+            else
+            {
+                TempData["Search"] = true;
+                ViewBag.Search = TempData["Search"];
+                data.Email = model.Email;
+                data.TransactionId = model.TransactionId;
+                data.Files = userUploads.UserUpload;
+                data.Users = userList;
+            }
+            return View("Index", data);
+        }
         // GET: UserDetail/Details/5
         public ActionResult Details(Guid? id)
         {

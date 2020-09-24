@@ -1,45 +1,232 @@
-﻿@model IEnumerable<SDSD_DeveloperTest_MVC5.Models.UserDetail>
+﻿@model SDSD_DeveloperTest_MVC5.ViewModel.IndexViewModel
 
 @{
     ViewBag.Title = "Index";
 }
 
-<h2>Index</h2>
+@* Alert Upload Successful *@
+<div class="row col-md-12 my-3">
+    @if (ViewBag.Success != null && ViewBag.Success != false)
+    {
+        <div class="alert alert-success alert-dismissible form-control p-2" role="alert">
+            <strong>Hello @ViewBag.User!</strong> Your documents was uploaded and an email sent successfully.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+</div>
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.TransactionId)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Name)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Email)
-        </th>
-        <th></th>
-    </tr>
+<div class="row col-md-12">
+    <div class="col-md-7">
+        <div class="alert alert-info alert-dismissible my-3 text-center" role="alert">
+            <strong>List of User Details with Unique Transaction ID</strong>
+        </div>
+        <p>
+            @Html.ActionLink("Create New", "Create")
+        </p>
+        <table class="table">
+            <tr>
+                <th>
+                    S/N
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Email
+                </th>
+                <th>
+                    Transaction ID
+                </th>
+                <th></th>
+            </tr>
+            @{ var i = 1;}
+            @foreach (var item in Model.Users)
+            {
+                <tr>
+                    <td>
+                        @(i++)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Email)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TransactionId)
+                    </td>
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new { id = item.UserDetailId }) |
+                        @Html.ActionLink("Details", "Details", new { id = item.UserDetailId }) |
+                        @Html.ActionLink("Delete", "Delete", new { id = item.UserDetailId })
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.TransactionId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Email)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.UserDetailId }) |
-            @Html.ActionLink("Details", "Details", new { id=item.UserDetailId }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.UserDetailId })
-        </td>
-    </tr>
-}
+    @* Search Grid *@
+    <div class="col-md-5">
+        @* Search Form *@
+        <div class="col-md-12">
+            <div class="alert alert-info alert-dismissible my-3 text-center" role="alert">
+                <strong>Enter your email & Unique Transaction Id</strong>
+            </div>
+            @* Display Error message *@
+            @if (ViewBag.Error != null && ViewBag.Error == true)
+            {
+                <div class="alert alert-warning alert-dismissible form-control p-2" role="alert">
+                    <strong>Sorry!</strong> You have entered an invalid email or Transaction Id.
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            }
 
-</table>
+            @if (ViewBag.Search != null && ViewBag.Search == true)
+            {
+                <div class="alert alert-success alert-dismissible form-control p-2" role="alert">
+                    <strong>Search Successful.</strong> Kindly scroll down to view your files.
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            }
+
+            @* Form start here *@
+            @using (Html.BeginForm("Search", "UserDetail", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="form-horizontal ">
+                    <hr />
+                    @Html.ValidationSummary(true, "", new { @class = "text-warning" })
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-3" })
+                        <div class="col-md-9">
+                            @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-warning" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.TransactionId, htmlAttributes: new { @class = "control-label col-md-3" })
+                        <div class="col-md-9">
+                            @Html.EditorFor(model => model.TransactionId, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.TransactionId, "", new { @class = "text-warning" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-3 col-md-9">
+                            <input type="submit" value="Search" class="btn btn-default" />
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @* Search Display *@
+            <div class="col-md-12">
+                @if (!(Model?.Files == null))
+                {
+                    <br /><br />
+                    <div class="alert alert-success alert-dismissible my-3 text-center" role="alert">
+                        <strong>View your file uploads here</strong>
+                    </div>
+                    <div class="row alert alert-dismissible alert-warning" role="alert">
+                        <div class="col-md-12 mx-auto">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table class="table">
+                                        <tr>
+                                            <th>
+                                                S/N
+                                            </th>
+                                            <th>
+                                                Email
+                                            </th>
+                                            <th>
+                                                Transaction ID
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                1
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(model => model.Email)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(model => model.TransactionId)
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                @foreach (var item in Model.Files)
+                                {
+                                    if (item.FilePath.Contains(".jpg") || item.FilePath.Contains(".png"))
+                                    {
+                                        var txt = item.FilePath;
+                                        <div class="col-md-6 align-items-center">
+                                            <div>
+                                                <a href="@txt" target="_blank" class="text-light" id="myText"><img src="@txt" alt="@txt" class="img-thumbnail"></a>
+                                            </div>
+                                            <div>
+                                                <a href="@txt" target="_blank" class="" id="myText">@item.FileName</a>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        if (item.FilePath.Contains(".doc"))
+                                        {
+                                            var txt = item.FilePath;
+                                            <div class="col-md-4">
+                                                <div>
+                                                    <a href="@txt" target="_blank" class="text-light" id="myText"><img src="~/images/microsoft-word-thumbnail-png-clip-art.png" alt="@txt" class="img-thumbnail"></a>
+                                                </div>
+                                                <div>
+                                                    <a href="@txt" target="_blank" class="" id="myText">@item.FileName</a>
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            if (item.FilePath.Contains(".xls"))
+                                            {
+                                                var txt = item.FilePath;
+                                                <div class="col-md-4">
+                                                    <div>
+                                                        <a href="@txt" target="_blank" class="text-light" id="myText"><img src="~/images/excel-doc.png" alt="@txt" class="img-thumbnail"></a>
+                                                    </div>
+                                                    <div>
+                                                        <a href="@txt" target="_blank" class="" id="myText">@item.FileName</a>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                    }
+
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="col-md-12 my-5">
+                        <div class="alert alert-warning alert-dismissible" role="alert">
+                            <p>No Contents to show yet</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
