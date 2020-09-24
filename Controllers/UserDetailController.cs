@@ -95,38 +95,11 @@ namespace SDSD_DeveloperTest_MVC5.Controllers
                 };
                 db.UserDetail.Add(data);
                 db.SaveChanges();
-                // Use your file here
-                foreach (var file in model.FormFiles)
-                {
-                    if (file.ContentLength > 0)
-                    {
-                        var upload = new UserUpload();
-                        //Check and change this after migration
-                        upload.UserUploadId = Guid.NewGuid();
-                        upload.TransactionId = data.TransactionId;
-                        upload.UserDetailId = data.UserDetailId;
 
-                        // Get FileName
-                        //upload.FileName = Path.GetFileName(file.FileName);
-                        string folderPath = "/Files/";
-                        string fileName = Path.GetFileNameWithoutExtension(file.FileName);
-                        string extension = Path.GetExtension(file.FileName);
-                        fileName = fileName + Guid.NewGuid() + extension;
-                        upload.FileName = file.FileName;
-                        string filePath = folderPath + fileName;
-                        upload.FilePath = filePath;
-                        fileName = Path.Combine(Server.MapPath(folderPath), fileName);
-                        file.SaveAs(fileName);
-                        db.UserUpload.Add(upload);
-                        db.SaveChanges();
-                        // create file path
-                        // save file to local storage
-                        // save filepath on upload class
-                    }
-                }
+                // Use your file here
+                UploadFiles(data, model);
 
                 // Send Mail
-
                 bool emailSent = SendEmail(data.Name, data.TransactionId, data.Email, model.FormFiles);
                 if (emailSent)
                 {
@@ -134,7 +107,6 @@ namespace SDSD_DeveloperTest_MVC5.Controllers
                     TempData["Alert"] = true;
                     return RedirectToAction("Index");
                 }
-
                 return View(model);
             }
             return View(model);
@@ -197,6 +169,39 @@ namespace SDSD_DeveloperTest_MVC5.Controllers
             return RedirectToAction("Index");
         }
 
+
+        //Upload files
+        private void UploadFiles(UserDetail data, CreateViewModel model)
+        {
+            foreach (var file in model.FormFiles)
+            {
+                if (file.ContentLength > 0)
+                {
+                    var upload = new UserUpload();
+                    //Check and change this after migration
+                    upload.UserUploadId = Guid.NewGuid();
+                    upload.TransactionId = data.TransactionId;
+                    upload.UserDetailId = data.UserDetailId;
+
+                    // Get FileName
+                    //upload.FileName = Path.GetFileName(file.FileName);
+                    string folderPath = "/Files/";
+                    string fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                    string extension = Path.GetExtension(file.FileName);
+                    fileName = fileName + Guid.NewGuid() + extension;
+                    upload.FileName = file.FileName;
+                    string filePath = folderPath + fileName;
+                    upload.FilePath = filePath;
+                    fileName = Path.Combine(Server.MapPath(folderPath), fileName);
+                    file.SaveAs(fileName);
+                    db.UserUpload.Add(upload);
+                    db.SaveChanges();
+                    // create file path
+                    // save file to local storage
+                    // save filepath on upload class
+                }
+            }
+        }
         // Send Email [HttpPost]  
         private bool SendEmail(string name, string transId, string receiver, List<HttpPostedFileBase> formFiles)
         {
