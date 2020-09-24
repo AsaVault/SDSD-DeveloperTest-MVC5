@@ -16,7 +16,7 @@ namespace SDSD_DeveloperTest_MVC5
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+                defaults: new { controller = "UserDetail", action = "Create", id = UrlParameter.Optional }
             );
         }
     }

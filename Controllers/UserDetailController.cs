@@ -5,6 +5,7 @@ using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Mail;
 using System.Web;
 using System.Web.Mvc;
 using SDSD_DeveloperTest_MVC5.Models;
@@ -54,7 +55,7 @@ namespace SDSD_DeveloperTest_MVC5.Controllers
             {
                 var data = new UserDetail()
                 {
-                    UserDetailId = model.Id,
+                    UserDetailId = Guid.NewGuid(),
                     Name = model.Name,
                     Email = model.Email,
                     TransactionId = "Upload-" + Guid.NewGuid()
@@ -68,7 +69,7 @@ namespace SDSD_DeveloperTest_MVC5.Controllers
                     {
                         var upload = new UserUpload();
                         //Check and change this after migration
-                        //upload.UserUploadId = Guid.NewGuid();
+                        upload.UserUploadId = Guid.NewGuid();
                         upload.TransactionId = data.TransactionId;
                         upload.UserDetailId = data.UserDetailId;
 
@@ -78,7 +79,7 @@ namespace SDSD_DeveloperTest_MVC5.Controllers
                         string fileName = Path.GetFileNameWithoutExtension(file.FileName);
                         string extension = Path.GetExtension(file.FileName);
                         fileName = fileName + Guid.NewGuid() + extension;
-                        upload.FileName = fileName;
+                        upload.FileName = file.FileName;
                         string filePath = folderPath + fileName;
                         upload.FilePath = filePath;
                         fileName = Path.Combine(Server.MapPath(folderPath), fileName);
@@ -90,7 +91,16 @@ namespace SDSD_DeveloperTest_MVC5.Controllers
                         // save filepath on upload class
                     }
                 }
-                return RedirectToAction("Index");
+
+                // Send Mail
+
+                bool emailSent = SendEmail(data.Name, data.TransactionId, data.Email, model.FormFiles);
+                if (emailSent)
+                {
+                    return RedirectToAction("Index");
+                }
+
+                return View(model);
             }
             return View(model);
         }
@@ -152,6 +162,50 @@ namespace SDSD_DeveloperTest_MVC5.Controllers
             return RedirectToAction("Index");
         }
 
+        // Send Email [HttpPost]  
+        private bool SendEmail(string name, string transId, string receiver, List<HttpPostedFileBase> formFiles)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var senderEmail = new MailAddress("asamoja9123@gmail.com", "SDSD DEVELOPER TEST");
+                    var receiverEmail = new MailAddress(receiver);
+                    var password = "asaVault9123!";
+                    var subject = "Document Successfully Uploaded";
+                    var body = $"Hello {name},  your documents was successfully uploaded. Here is your Transaction ID {transId}. Kindly find your attached documents.";  // Message Body;
+                    var smtp = new SmtpClient
+                    {
+                        Host = "smtp.gmail.com",
+                        Port = 587,
+                        EnableSsl = true,
+                        DeliveryMethod = SmtpDeliveryMethod.Network,
+                        UseDefaultCredentials = false,
+                        Credentials = new NetworkCredential(senderEmail.Address, password)
+                    };
+
+                    using (var mess = new MailMessage(senderEmail, receiverEmail)
+                    {
+                        Subject = subject,
+                        Body = body
+                    } )
+                    {
+                        foreach (var attachment in formFiles)
+                        {
+                            string fileName = Path.GetFileName(attachment.FileName);
+                            mess.Attachments.Add(new Attachment(attachment.InputStream, fileName));
+                        }
+                        smtp.Send(mess);
+                    }
+                    return true;
+                }
+            }
+            catch (Exception)
+            {
+                ViewBag.Error = "Email failed to be sent";
+            }
+            return false;
+        }
         protected override void Dispose(bool disposing)
         {
             if (disposing)
