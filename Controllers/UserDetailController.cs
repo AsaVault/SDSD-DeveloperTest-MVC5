@@ -20,7 +20,7 @@ namespace SDSD_DeveloperTest_MVC5.Controllers
         // GET: UserDetail
         public ActionResult Index()
         {
-            var userDb = db.UserDetail.ToList();
+            var userDb = db.UserDetail.OrderByDescending(x=>x.UserDetailId).ToList();
             var data = new IndexViewModel()
             {
                 Users = userDb
@@ -35,7 +35,7 @@ namespace SDSD_DeveloperTest_MVC5.Controllers
         {
             ViewBag.Error = false;
             ViewBag.Search = false;
-            var userList = db.UserDetail.ToList();
+            var userList = db.UserDetail.OrderByDescending(x => x.UserDetailId).ToList();
             var userUploads = db.UserDetail.Include(x => x.UserUpload).FirstOrDefault(x => x.TransactionId == model.TransactionId && x.Email == model.Email);
             var data = new IndexViewModel();
             if (userUploads == null)
@@ -49,6 +49,7 @@ namespace SDSD_DeveloperTest_MVC5.Controllers
                 TempData["Search"] = true;
                 ViewBag.Search = TempData["Search"];
                 data.Email = model.Email;
+                data.Name = userUploads.Name;
                 data.TransactionId = model.TransactionId;
                 data.Files = userUploads.UserUpload;
                 data.Users = userList;
@@ -129,6 +130,8 @@ namespace SDSD_DeveloperTest_MVC5.Controllers
                 bool emailSent = SendEmail(data.Name, data.TransactionId, data.Email, model.FormFiles);
                 if (emailSent)
                 {
+                    TempData["User"] = model.Name;
+                    TempData["Alert"] = true;
                     return RedirectToAction("Index");
                 }
 

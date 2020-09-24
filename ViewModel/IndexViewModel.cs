@@ -15,6 +15,7 @@ namespace SDSD_DeveloperTest_MVC5.ViewModel
         [Display(Name = "Email", Prompt = "Enter your Email")]
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
+        public string Name { get; set; }
         public IEnumerable<UserUpload> Files { get; set; }
         public IEnumerable<UserDetail> Users { get; set; }
     }
